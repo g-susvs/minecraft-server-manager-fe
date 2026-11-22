@@ -2,10 +2,9 @@ import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/cor
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 
-import { TDifficulty, IWorldOptions } from '../../../../core/models/server.model';
+import { IWorldOptions, TDifficulty } from '../../../../core/models/server.model';
 import { ServerStore } from '../../../../core/state/server.store';
-
-const NAME_HELPER = 'Solo letras, números, espacios, guiones y guiones bajos';
+import { CREATE_CONTENT } from '../../content/create.content';
 
 @Component({
   selector: 'app-server-create-page',
@@ -17,22 +16,9 @@ export class ServerCreatePage {
   private readonly fb = inject(FormBuilder);
   private readonly router = inject(Router);
   readonly store = inject(ServerStore);
+  readonly content = CREATE_CONTENT;
 
-  readonly nameHelper = NAME_HELPER;
   readonly serverError = signal<string | null>(null);
-
-  readonly difficulties: { value: TDifficulty; label: string }[] = [
-    { value: 'pacifica', label: 'Pacífica' },
-    { value: 'facil', label: 'Fácil' },
-    { value: 'normal', label: 'Normal' },
-    { value: 'dificil', label: 'Difícil' },
-  ];
-
-  readonly worldToggles: { key: keyof IWorldOptions; label: string; hint: string }[] = [
-    { key: 'showCoordinates', label: 'Mostrar coordenadas', hint: 'Muestra tu posición X, Y, Z en el juego' },
-    { key: 'bonusChest', label: 'Cofre de regalo', hint: 'Incluye un cofre con objetos al empezar' },
-    { key: 'starterMap', label: 'Mapa inicial', hint: 'Te entrega un mapa del mundo al empezar' },
-  ];
 
   readonly form = this.fb.nonNullable.group({
     name: [
@@ -50,10 +36,10 @@ export class ServerCreatePage {
   nameError(): string | null {
     const control = this.form.controls.name;
     if (!control.dirty && !control.touched) return null;
-    if (control.hasError('required')) return 'Escribe un nombre para el servidor';
-    if (control.hasError('minlength')) return 'Mínimo 3 caracteres';
-    if (control.hasError('pattern')) return NAME_HELPER;
-    if (control.hasError('taken')) return 'Ya existe un servidor con ese nombre';
+    if (control.hasError('required')) return this.content.nameErrors.required;
+    if (control.hasError('minlength')) return this.content.nameErrors.minLength;
+    if (control.hasError('pattern')) return this.content.nameErrors.pattern;
+    if (control.hasError('taken')) return this.content.nameErrors.taken;
     return null;
   }
 
@@ -72,7 +58,7 @@ export class ServerCreatePage {
         if (err.code === 'NAME_IN_USE') {
           this.form.controls.name.setErrors({ taken: true });
         } else {
-          this.serverError.set('No pudimos crear el servidor. Intenta de nuevo.');
+          this.serverError.set(this.content.saveFailed);
         }
       },
     });

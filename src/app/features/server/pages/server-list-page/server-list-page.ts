@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/cor
 import { RouterLink } from '@angular/router';
 
 import { ServerStore } from '../../../../core/state/server.store';
+import { LIST_CONTENT } from '../../content/list.content';
 import { ServerCard } from '../../components/server-card/server-card';
 
 @Component({
@@ -12,6 +13,7 @@ import { ServerCard } from '../../components/server-card/server-card';
 })
 export class ServerListPage implements OnInit {
   readonly store = inject(ServerStore);
+  readonly content = LIST_CONTENT;
 
   ngOnInit(): void {
     this.store.loadAll();

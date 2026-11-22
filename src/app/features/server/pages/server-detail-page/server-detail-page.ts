@@ -1,27 +1,14 @@
 import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, computed, inject } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 
-import {
-  TDifficulty,
-  TServerAction,
-  TServerStatus,
-} from '../../../../core/models/server.model';
+import { TServerAction, TServerStatus } from '../../../../core/models/server.model';
 import { ServerStore } from '../../../../core/state/server.store';
 import { CostSignal, CostSignalState } from '../../../../shared/ui/cost-signal/cost-signal';
 import { InfoCard, InfoRow } from '../../../../shared/ui/info-card/info-card';
 import { IpDisplay, IpDisplayState } from '../../../../shared/ui/ip-display/ip-display';
 import { StatusBadge } from '../../../../shared/ui/status-badge/status-badge';
-
-// Textos de la vista de detalle según el diseño de Pen (no coinciden con el badge de la lista).
-const BADGE_LABELS: Record<TServerStatus, string> = {
-  stopped: 'Apagado',
-  pending: 'Encendiendo…',
-  starting: 'Encendiendo…',
-  installing: 'Instalando Minecraft…',
-  'running-ready': 'Encendido',
-  stopping: 'Apagando…',
-  'network-error': 'Desconocido',
-};
+import { DIFFICULTY_LABELS } from '../../content/create.content';
+import { DETAIL_CONTENT } from '../../content/detail.content';
 
 // Qué muestra el bloque de IP en cada estado.
 const IP_STATES: Record<TServerStatus, IpDisplayState> = {
@@ -34,23 +21,16 @@ const IP_STATES: Record<TServerStatus, IpDisplayState> = {
   'network-error': 'unavailable',
 };
 
-// Estados transitorios con barra de progreso y su texto.
-const PROGRESS_BY_STATUS: Partial<Record<TServerStatus, { label: string; width: string }>> = {
-  pending: { label: 'Iniciando máquina…', width: 'w-1/4' },
-  starting: { label: 'Iniciando máquina…', width: 'w-1/4' },
-  installing: { label: 'Descargando e instalando…', width: 'w-1/2' },
-  stopping: { label: 'Guardando mundo y apagando…', width: 'w-3/4' },
+// Ancho de la barra de progreso en cada estado transitorio.
+const PROGRESS_WIDTHS: Partial<Record<TServerStatus, string>> = {
+  pending: 'w-1/4',
+  starting: 'w-1/4',
+  installing: 'w-1/2',
+  stopping: 'w-3/4',
 };
 
 // Estados en los que el botón principal apaga el servidor (o lo estaría apagando).
 const STOP_ACTION_STATUSES: TServerStatus[] = ['running-ready', 'pending', 'starting', 'installing'];
-
-const DIFFICULTY_LABELS: Record<TDifficulty, string> = {
-  pacifica: 'Pacífica',
-  facil: 'Fácil',
-  normal: 'Normal',
-  dificil: 'Difícil',
-};
 
 function costStateFor(status: TServerStatus): CostSignalState | undefined {
   switch (status) {
@@ -74,16 +54,15 @@ function costStateFor(status: TServerStatus): CostSignalState | undefined {
 export class ServerDetailPage implements OnInit, OnDestroy {
   private readonly route = inject(ActivatedRoute);
   readonly store = inject(ServerStore);
-
-  readonly badgeLabels = BADGE_LABELS;
+  readonly content = DETAIL_CONTENT;
 
   // Filas de la tarjeta de información, derivadas del servidor cargado.
   readonly infoRows = computed<InfoRow[]>(() => {
     const server = this.store.selected();
     if (!server) return [];
     return [
-      { label: 'Dificultad', value: DIFFICULTY_LABELS[server.difficulty] },
-      { label: 'ID', value: server.id },
+      { label: this.content.infoLabels.difficulty, value: DIFFICULTY_LABELS[server.difficulty] },
+      { label: this.content.infoLabels.id, value: server.id },
     ];
   });
 
@@ -111,8 +90,8 @@ export class ServerDetailPage implements OnInit, OnDestroy {
     return IP_STATES[status];
   }
 
-  progressFor(status: TServerStatus): { label: string; width: string } | undefined {
-    return PROGRESS_BY_STATUS[status];
+  progressWidthFor(status: TServerStatus): string {
+    return PROGRESS_WIDTHS[status] ?? '';
   }
 
   costStateFor(status: TServerStatus): CostSignalState | undefined {
@@ -129,7 +108,7 @@ export class ServerDetailPage implements OnInit, OnDestroy {
   }
 
   actionLabel(status: TServerStatus): string {
-    return this.isStopAction(status) ? 'Apagar servidor' : 'Encender servidor';
+    return this.isStopAction(status) ? this.content.actionStop : this.content.actionStart;
   }
 
   actionClass(status: TServerStatus): string {
