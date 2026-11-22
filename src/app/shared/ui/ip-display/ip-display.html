@@ -22,10 +22,10 @@
           <path d="M11 5V4a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h1" />
         </svg>
         Copiar
-         ✅
-        ¡Copiado!
       </button>
     </div>
-    <p class="mt-2 text-xs {{ isFading() ? 'text-amber-300' : 'text-[#94A3B8]' }}">{{ hint() }}</p>
+    @if (hint()) {
+      <p class="mt-2 text-xs {{ isFading() ? 'text-amber-300' : 'text-[#94A3B8]' }}">{{ hint() }}</p>
+    }
   }
 </div>

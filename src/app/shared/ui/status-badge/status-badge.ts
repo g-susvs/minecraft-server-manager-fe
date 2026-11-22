@@ -24,6 +24,8 @@ export type ServerStatus =
 })
 export class StatusBadge {
   readonly status = input.required<ServerStatus>();
+  // Texto opcional que reemplaza al mapeo por defecto (por ejemplo, el de la vista de detalle).
+  readonly customLabel = input<string | null>(null);
 
   // Solo mapeo presentacional estado -> estilos/texto (cero lógica de negocio).
   readonly pillClass = computed(() => {
@@ -74,4 +76,6 @@ export class StatusBadge {
         return 'Detenido';
     }
   });
+
+  readonly displayLabel = computed(() => this.customLabel() ?? this.label());
 }

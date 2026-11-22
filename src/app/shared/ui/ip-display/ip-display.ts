@@ -35,6 +35,9 @@ export class IpDisplay {
         return 'La dirección cambiará al reiniciar.';
       case 'unavailable':
         return 'Dirección no disponible.';
+      case 'ready':
+        // Con la dirección ya visible no hay nada que explicar.
+        return '';
       default:
         return 'Tu dirección aparecerá aquí.';
     }

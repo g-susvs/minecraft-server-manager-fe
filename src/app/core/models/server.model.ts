@@ -29,3 +29,5 @@ export interface INewServerDraft {
   difficulty: TDifficulty;
   worldOptions: IWorldOptions;
 }
+
+export type TServerAction = 'start' | 'stop';

@@ -13,6 +13,11 @@ export const routes: Routes = [
       import('./features/server/pages/server-create-page/server-create-page').then((m) => m.ServerCreatePage),
   },
   {
+    path: 'servers/:id',
+    loadComponent: () =>
+      import('./features/server/pages/server-detail-page/server-detail-page').then((m) => m.ServerDetailPage),
+  },
+  {
     path: 'ui-lab',
     loadComponent: () =>
       import('./features/server/pages/ui-lab/ui-lab').then((m) => m.UiLab),
