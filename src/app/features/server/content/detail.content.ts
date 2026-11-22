@@ -41,4 +41,6 @@ export const DETAIL_CONTENT = {
     difficulty: 'Dificultad',
     id: 'ID',
   },
+  // Se muestra cuando el backend todavía no devuelve la dificultad.
+  unknownValue: '—',
 };

@@ -61,7 +61,10 @@ export class ServerDetailPage implements OnInit, OnDestroy {
     const server = this.store.selected();
     if (!server) return [];
     return [
-      { label: this.content.infoLabels.difficulty, value: DIFFICULTY_LABELS[server.difficulty] },
+      {
+        label: this.content.infoLabels.difficulty,
+        value: server.difficulty ? DIFFICULTY_LABELS[server.difficulty] : this.content.unknownValue,
+      },
       { label: this.content.infoLabels.id, value: server.id },
     ];
   });

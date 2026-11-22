@@ -24,7 +24,8 @@ const WORLD_TOGGLES: IWorldToggle[] = [
   { key: 'starterMap', label: 'Mapa inicial', hint: 'Te entrega un mapa del mundo al empezar' },
 ];
 
-const NAME_HELPER = 'Solo letras, números, espacios, guiones y guiones bajos';
+// Mismas reglas que el backend (createServerSchema): sin acentos y máximo 50 caracteres.
+const NAME_HELPER = 'Solo letras sin acentos, números, espacios, guiones y guiones bajos';
 
 // Textos visibles de la página de crear servidor.
 export const CREATE_CONTENT = {
@@ -36,8 +37,8 @@ export const CREATE_CONTENT = {
   nameErrors: {
     required: 'Escribe un nombre para el servidor',
     minLength: 'Mínimo 3 caracteres',
+    maxLength: 'Máximo 50 caracteres',
     pattern: NAME_HELPER,
-    taken: 'Ya existe un servidor con ese nombre',
   },
   difficultyTitle: 'Dificultad',
   difficulties: DIFFICULTY_OPTIONS,

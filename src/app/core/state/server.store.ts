@@ -2,11 +2,14 @@ import { Injectable, inject, signal } from '@angular/core';
 import { Observable, Subscription, finalize, switchMap, take, tap, timer } from 'rxjs';
 
 import { ServerApi } from '../api/server.api';
+import { toServerStatus } from '../mappers/server.mapper';
+import { IApiError } from '../models/api-error.model';
 import { INewServerDraft, IServer, TServerAction, TServerStatus } from '../models/server.model';
 
-// Intervalo y límite del polling de estado en la vista de detalle.
+// EC2 tarda minutos en arrancar e instalar Minecraft, así que el polling
+// dura unos 2 minutos (40 consultas de 3 s).
 const POLL_INTERVAL_MS = 3000;
-const MAX_POLL_ATTEMPTS = 10;
+const MAX_POLL_ATTEMPTS = 40;
 
 // Estados que cambian solos y necesitan polling hasta llegar a uno terminal.
 const TRANSITIONAL_STATUSES: TServerStatus[] = ['pending', 'installing', 'starting', 'stopping'];
@@ -40,8 +43,12 @@ export class ServerStore {
         this.servers.set(servers);
         this.loading.set(false);
       },
-      error: () => {
-        this.error.set('No pudimos cargar tus servidores.');
+      error: (err: IApiError) => {
+        this.error.set(
+          err.code === 'NETWORK'
+            ? 'No hay conexión con el servidor. Revisa que el backend esté activo.'
+            : 'No pudimos cargar tus servidores.',
+        );
         this.loading.set(false);
       },
     });
@@ -70,12 +77,8 @@ export class ServerStore {
           this.poll(id);
         }
       },
-      error: (err: { code?: string }) => {
-        this.selectedError.set(
-          err.code === 'NOT_FOUND'
-            ? 'No encontramos este servidor.'
-            : 'No pudimos obtener el estado del servidor.',
-        );
+      error: (err: IApiError) => {
+        this.selectedError.set(this.detailErrorMessage(err));
         this.selectedLoading.set(false);
       },
     });
@@ -88,13 +91,16 @@ export class ServerStore {
     this.actionError.set(null);
 
     this.api.sendAction(id, action).subscribe({
-      next: (server) => {
-        this.applySelected(server);
+      next: (statusDto) => {
+        // Se aplica el estado que confirma el backend y después se sigue el progreso.
+        this.patchSelectedStatus(toServerStatus(statusDto));
         this.actingAction.set(null);
-        this.poll(id);
+        if (isTransitional(toServerStatus(statusDto))) {
+          this.poll(id);
+        }
       },
-      error: () => {
-        this.actionError.set('No se pudo completar la acción. Intenta de nuevo.');
+      error: (err: IApiError) => {
+        this.actionError.set(err.message);
         this.actingAction.set(null);
       },
     });
@@ -123,8 +129,27 @@ export class ServerStore {
       });
   }
 
+  // Mensaje para la tarjeta de error de la vista de detalle.
+  private detailErrorMessage(err: IApiError): string {
+    switch (err.code) {
+      case 'NOT_FOUND':
+      case 'VALIDATION':
+        return 'No encontramos este servidor.';
+      case 'NETWORK':
+        return 'No hay conexión con el servidor. Revisa que el backend esté activo.';
+      default:
+        return 'No pudimos obtener el estado del servidor.';
+    }
+  }
+
   private applySelected(server: IServer): void {
     this.selected.set(server);
     this.servers.update((list) => list.map((s) => (s.id === server.id ? server : s)));
+  }
+
+  private patchSelectedStatus(status: TServerStatus): void {
+    const current = this.selected();
+    if (!current) return;
+    this.applySelected({ ...current, status });
   }
 }

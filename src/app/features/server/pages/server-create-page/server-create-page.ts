@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/cor
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 
+import { IApiError } from '../../../../core/models/api-error.model';
 import { IWorldOptions, TDifficulty } from '../../../../core/models/server.model';
 import { ServerStore } from '../../../../core/state/server.store';
 import { CREATE_CONTENT } from '../../content/create.content';
@@ -23,7 +24,12 @@ export class ServerCreatePage {
   readonly form = this.fb.nonNullable.group({
     name: [
       '',
-      [Validators.required, Validators.minLength(3), Validators.pattern(/^[\p{L}\p{N} _-]+$/u)],
+      [
+        Validators.required,
+        Validators.minLength(3),
+        Validators.maxLength(50),
+        Validators.pattern(/^[a-zA-Z0-9 _-]+$/),
+      ],
     ],
     difficulty: ['normal' as TDifficulty, Validators.required],
     worldOptions: this.fb.nonNullable.group({
@@ -38,8 +44,8 @@ export class ServerCreatePage {
     if (!control.dirty && !control.touched) return null;
     if (control.hasError('required')) return this.content.nameErrors.required;
     if (control.hasError('minlength')) return this.content.nameErrors.minLength;
+    if (control.hasError('maxlength')) return this.content.nameErrors.maxLength;
     if (control.hasError('pattern')) return this.content.nameErrors.pattern;
-    if (control.hasError('taken')) return this.content.nameErrors.taken;
     return null;
   }
 
@@ -54,12 +60,9 @@ export class ServerCreatePage {
 
     this.store.create(this.form.getRawValue()).subscribe({
       next: () => void this.router.navigate(['/servers']),
-      error: (err: { code?: string }) => {
-        if (err.code === 'NAME_IN_USE') {
-          this.form.controls.name.setErrors({ taken: true });
-        } else {
-          this.serverError.set(this.content.saveFailed);
-        }
+      error: (err: IApiError) => {
+        // Las validaciones del backend traen un mensaje específico; el resto usa el genérico.
+        this.serverError.set(err.code === 'VALIDATION' ? err.message : this.content.saveFailed);
       },
     });
   }
