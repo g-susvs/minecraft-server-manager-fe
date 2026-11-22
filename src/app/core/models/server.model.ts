@@ -1,4 +1,4 @@
-export type ServerStatus =
+export type TServerStatus =
   | 'stopped'
   | 'pending'
   | 'installing'
@@ -7,19 +7,25 @@ export type ServerStatus =
   | 'stopping'
   | 'network-error';
 
-export type Difficulty = 'pacifica' | 'facil' | 'normal' | 'dificil';
+export type TDifficulty = 'pacifica' | 'facil' | 'normal' | 'dificil';
 
-export interface WorldOptions {
+export interface IWorldOptions {
   showCoordinates: boolean;
   bonusChest: boolean;
   starterMap: boolean;
 }
 
-export interface Server {
+export interface IServer {
   id: string;
   name: string;
-  difficulty: Difficulty;
-  worldOptions: WorldOptions;
-  status: ServerStatus;
+  difficulty: TDifficulty;
+  worldOptions: IWorldOptions;
+  status: TServerStatus;
   connectionAddress: string | null;
+}
+
+export interface INewServerDraft {
+  name: string;
+  difficulty: TDifficulty;
+  worldOptions: IWorldOptions;
 }

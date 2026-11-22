@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 import { StatusBadge } from '../../../../shared/ui/status-badge/status-badge';
-import { Server } from '../../../../core/models/server.model';
+import { IServer } from '../../../../core/models/server.model';
 
 @Component({
   selector: 'app-server-card',
@@ -11,5 +11,5 @@ import { Server } from '../../../../core/models/server.model';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ServerCard {
-  readonly server = input.required<Server>();
+  readonly server = input.required<IServer>();
 }

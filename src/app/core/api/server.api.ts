@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
-import { Observable, delay, of } from 'rxjs';
+import { Observable, delay, of, throwError } from 'rxjs';
 
-import { Server } from '../models/server.model';
+import { INewServerDraft, IServer } from '../models/server.model';
 
-// Mock temporal: sustituir por HttpClient cuando el backend exponga GET /api/servers.
-const MOCK_SERVERS: Server[] = [
+// Mock temporal: sustituir por HttpClient cuando el backend exponga /api/servers.
+const INITIAL_SERVERS: IServer[] = [
   {
     id: '1',
     name: 'Survival con amigos',
@@ -33,7 +33,28 @@ const MOCK_SERVERS: Server[] = [
 
 @Injectable({ providedIn: 'root' })
 export class ServerApi {
-  listServers(): Observable<Server[]> {
-    return of(MOCK_SERVERS).pipe(delay(400));
+  private readonly servers: IServer[] = [...INITIAL_SERVERS];
+
+  listServers(): Observable<IServer[]> {
+    return of([...this.servers]).pipe(delay(400));
+  }
+
+  createServer(draft: INewServerDraft): Observable<IServer> {
+    const name = draft.name.trim();
+    const taken = this.servers.some((s) => s.name.toLowerCase() === name.toLowerCase());
+    if (taken) {
+      return throwError(() => ({ code: 'NAME_IN_USE' })).pipe(delay(400));
+    }
+
+    const server: IServer = {
+      id: String(Date.now()),
+      name,
+      difficulty: draft.difficulty,
+      worldOptions: { ...draft.worldOptions },
+      status: 'pending',
+      connectionAddress: null,
+    };
+    this.servers.push(server);
+    return of(server).pipe(delay(600));
   }
 }
