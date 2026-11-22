@@ -1,0 +1,31 @@
+<div class="w-full rounded-xl border border-[#2D3F56] bg-[#1A2332] p-4">
+  <p class="text-xs font-medium uppercase tracking-wider text-[#64748B]">Dirección IP</p>
+
+  @if (showSkeleton()) {
+    <div class="mt-2 h-6 w-3/4 animate-pulse rounded-md bg-[#2D3F56]" aria-hidden="true"></div>
+    <p class="mt-2 text-xs text-[#94A3B8]">{{ hint() }}</p>
+  } @else {
+    <div class="mt-2 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <code
+        class="block truncate font-mono text-sm text-[#F1F5F9] {{ isFading() ? 'opacity-50' : '' }}"
+      >
+        {{ address() ?? '— — —' }}
+      </code>
+      <button
+        type="button"
+        (click)="onCopy()"
+        [disabled]="!canCopy()"
+        class="inline-flex shrink-0 items-center justify-center gap-1.5 rounded-lg border border-[#2D3F56] bg-[#0D1012] px-3 py-2 text-xs font-medium text-[#F1F5F9] transition hover:border-[#4AA63D] disabled:cursor-not-allowed disabled:opacity-40"
+      >
+        <svg class="size-3.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+          <rect x="5" y="5" width="9" height="9" rx="2" />
+          <path d="M11 5V4a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h1" />
+        </svg>
+        Copiar
+         ✅
+        ¡Copiado!
+      </button>
+    </div>
+    <p class="mt-2 text-xs {{ isFading() ? 'text-amber-300' : 'text-[#94A3B8]' }}">{{ hint() }}</p>
+  }
+</div>

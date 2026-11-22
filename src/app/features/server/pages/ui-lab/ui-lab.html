@@ -1,0 +1,40 @@
+<div class="min-h-screen bg-[#0D1012] px-4 py-8">
+  <div class="mx-auto w-full max-w-[480px] space-y-8">
+    <h1 class="text-lg font-semibold text-white">UI Lab · dumb components</h1>
+
+    <section class="space-y-3">
+      <h2 class="text-xs font-medium uppercase tracking-wider text-[#64748B]">status-badge</h2>
+      <div class="flex flex-wrap gap-2">
+        <app-status-badge status="stopped" />
+        <app-status-badge status="pending" />
+        <app-status-badge status="installing" />
+        <app-status-badge status="running-ready" />
+        <app-status-badge status="stopping" />
+        <app-status-badge status="network-error" />
+      </div>
+    </section>
+
+    <section class="space-y-3">
+      <h2 class="text-xs font-medium uppercase tracking-wider text-[#64748B]">ip-display</h2>
+      <app-ip-display state="ready" address="juega.midominio.com:25565" (copied)="onCopied()" />
+      <app-ip-display state="loading" (copied)="onCopied()" />
+      <app-ip-display state="waiting" (copied)="onCopied()" />
+      <app-ip-display state="fading" address="juega.midominio.com:25565" (copied)="onCopied()" />
+      <app-ip-display state="unavailable" (copied)="onCopied()" />
+      <app-ip-display state="placeholder" (copied)="onCopied()" />
+    </section>
+
+    <section class="space-y-3">
+      <h2 class="text-xs font-medium uppercase tracking-wider text-[#64748B]">cost-signal</h2>
+      <app-cost-signal state="off" />
+      <app-cost-signal state="on" />
+      <app-cost-signal state="turning-off" />
+    </section>
+
+    <section class="space-y-3">
+      <h2 class="text-xs font-medium uppercase tracking-wider text-[#64748B]">info-card</h2>
+      <app-info-card title="Servidor" [rows]="infoRows" />
+      <app-info-card title="Vacía" [rows]="[]" emptyText="Sin información todavía" />
+    </section>
+  </div>
+</div>

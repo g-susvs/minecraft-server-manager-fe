@@ -1,0 +1,13 @@
+<section class="w-full rounded-xl border border-[#2D3F56] bg-[#1A2332] p-4">
+  <h2 class="text-xs font-medium uppercase tracking-wider text-[#64748B]">{{ title() }}</h2>
+  <dl class="mt-3 space-y-2.5">
+    @for (row of rows(); track row.label) {
+      <div class="flex items-baseline justify-between gap-3">
+        <dt class="shrink-0 text-xs text-[#94A3B8]">{{ row.label }}</dt>
+        <dd class="truncate text-right text-sm font-medium text-[#F1F5F9]">{{ row.value }}</dd>
+      </div>
+    } @empty {
+      <p class="text-xs text-[#64748B]">{{emptyText()}}</p>
+    }
+  </dl>
+</section>

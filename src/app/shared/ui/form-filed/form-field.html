@@ -1,0 +1,16 @@
+<div class="input-container">
+    <label class="text-white">Nombre del servidor</label>
+    <input 
+        type="text" 
+        [placeholder]="placeholder"
+        class="input"
+        [value]="value"
+    >
+    @if (hint && !errorMessage) {
+        <p class="hint">{{hint}}</p>
+    }
+
+    @if(errorMessage){
+        <p class="error-message">{{errorMessage}}</p>
+    }
+</div>

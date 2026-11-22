@@ -1,0 +1,21 @@
+@reference '../../../../styles.css';
+
+.input-container{
+    @apply flex flex-col;
+}
+
+.input{
+    @apply px-2 py-1 border border-gray-600 rounded-lg placeholder:text-gray-400 bg-gray-800 text-white text-lg;
+}
+
+.input--error{
+    @apply border-red-400;
+}
+
+.hint{
+    @apply text-gray-400 text-[0.8rem];
+}
+
+.error-message{
+    @apply text-red-400 text-[0.8rem];
+}
